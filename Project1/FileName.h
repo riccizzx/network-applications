@@ -7,7 +7,8 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-#define port 9909
+//#define port 53072
+#define port 9909 // 127.0.0.1
 //fd_set fr, fw, fe;
 
 class Net {
@@ -18,8 +19,8 @@ public:
 	void run();
 
 private:
+	void closeSocket();
 	SOCKET serverSock;
 	SOCKET clientSock;
 	int nRet =0;
-
 };
