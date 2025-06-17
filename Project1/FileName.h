@@ -7,7 +7,6 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-//#define port 53072
 #define port 9909 // 127.0.0.1
 //fd_set fr, fw, fe;
 
