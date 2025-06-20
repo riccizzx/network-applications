@@ -16,6 +16,7 @@ public:
 	void createSocket();
 	void bindSocket();
 	void run();
+	void processRequest();
 
 private:
 	void closeSocket();

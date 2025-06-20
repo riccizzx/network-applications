@@ -2,6 +2,8 @@
 
 FD_SET fr, fw, fe;
 int nMaxFd;
+int arrClient[5];
+
 
 //initialize winsock API
 void Net::initialize() {
@@ -110,14 +112,19 @@ void Net::bindSocket() {
 			std::cout << nRet << " sockets are ready for reading." << std::endl;
 			//WSACleanup(); // Clean up Winsock
 			//exit(EXIT_FAILURE);
-			clientSock = accept(serverSock, NULL, NULL);
-			if (clientSock != 0) {
-				std::cout << "Client connected successfully." << std::endl;
-				FD_SET(clientSock, &fr); // add client socket to the read set
-			}
-			else {
-				std::cerr << "Accept failed with error: " << WSAGetLastError() << std::endl;
-			}
+			//clientSock = accept(serverSock, NULL, NULL);
+			//if (clientSock != 0) {
+			//	std::cout << "Client connected successfully." << std::endl;
+			//	FD_SET(clientSock, &fr); // add client socket to the read set
+			//}
+			//else {
+			//	std::cerr << "Accept failed with error: " << WSAGetLastError() << std::endl;
+			//}
+			char buff[255] = { 0 };
+			recv(serverSock, buff, 255, 0); // dummy receive to clear the socket
+			std::cout << "Press any key to continue..." << std::endl;
+			getchar();
+			std::cout << "\n" << "Received data: " << buff << std::endl;
 		}
 		std::cout << fr.fd_count << " sockets in read set after select." << std::endl;
 		Sleep(2000);
@@ -128,6 +135,28 @@ void Net::bindSocket() {
 
 	//accept a connection
 	//clientSock = accept(serverSock, NULL, NULL);
+}
+
+//process request from client
+void Net::processRequest() {
+	if (FD_ISSET(serverSock, &fr)) {
+		std::cout << "Server socket is ready for reading." << std::endl;
+
+		int nlen = sizeof(sockaddr_in);
+		clientSock = accept(serverSock, NULL, &nlen);
+		if (clientSock != 0) {
+			for (int i = 0;i < 5;i++) {
+				if (arrClient[i] == 0) {
+					arrClient[i] = clientSock; // store the client socket in the array
+					send(clientSock, "Welcome to the server!\n", 255, 0); // send welcome message
+					break;
+				}
+			}
+		}
+		else {
+			std::cerr << "Accept failed with error: " << WSAGetLastError() << std::endl;
+		}
+	}
 }
 
 //close socket
@@ -144,6 +173,7 @@ void Net::run() {
 	net.initialize();
 	net.createSocket();
 	net.bindSocket();
+	net.processRequest();
 	std::cout << "Network operations completed." << std::endl;
 	//net.closeSocket();
 	return;
